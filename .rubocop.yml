@@ -1,0 +1,17 @@
+AllCops:
+  TargetRubyVersion: 2.6
+  Exclude:
+    - 'db/schema.rb'
+    - 'bin/*'
+
+Metrics/BlockLength:
+  ExcludedMethods: ['describe', 'context']
+
+Metrics/LineLength:
+  Max: 130
+
+Rails:
+  Enabled: true
+
+Style/Documentation:
+  Enabled: false
