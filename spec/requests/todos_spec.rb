@@ -3,6 +3,36 @@
 require 'rails_helper'
 
 RSpec.describe 'todos' do
+  describe 'GET /todos' do
+    context 'when there are no todos' do
+      it 'responds with http 200' do
+        get '/todos'
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'responds with an empty array as json' do
+        get '/todos'
+        response_body = JSON.parse(response.body)
+        expect(response_body).to eql([])
+      end
+    end
+
+    context 'when there are some todos' do
+      let!(:todos) { create_list(:todo, 3) }
+
+      it 'responds with http 200' do
+        get '/todos'
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'responds with the todos in an array' do
+        get '/todos'
+        response_body = JSON.parse(response.body)
+        expect(response_body.count).to eq(todos.count)
+      end
+    end
+  end
+
   describe 'GET /todos/:id' do
     context 'when there is a todo with the specified id' do
       let!(:todo) { create(:todo) }

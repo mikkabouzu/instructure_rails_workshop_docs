@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   root to: 'healthcheck#index'
   get :healthcheck, to: 'healthcheck#index'
 
+  get 'todos', to: 'todos#index'
   get 'todos/:id', to: 'todos#show'
   delete 'todos/:id', to: 'todos#destroy'
 end
