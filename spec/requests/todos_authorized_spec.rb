@@ -23,7 +23,9 @@ RSpec.describe 'todos authorized' do
     end
 
     context 'when there are some todos' do
-      let!(:todos) { create_list(:todo, 3) }
+      let!(:completed_todos) { create_list(:todo, 2, :completed) }
+      let!(:uncompleted_todos) { create_list(:todo, 4, :uncompleted) }
+      let(:all_todos) { completed_todos + uncompleted_todos }
 
       it 'responds with http 200' do
         get '/todos', headers: headers
@@ -33,7 +35,25 @@ RSpec.describe 'todos authorized' do
       it 'responds with the todos in an array' do
         get '/todos', headers: headers
         response_body = JSON.parse(response.body)
-        expect(response_body.count).to eq(todos.count)
+        expect(response_body.count).to eq(all_todos.count)
+      end
+
+      it 'can be filtered for completed todos' do
+        get '/todos', params: { completed: true }, headers: headers
+        response_body = JSON.parse(response.body)
+        aggregate_failures do
+          expect(response_body.count).to eq(completed_todos.count)
+          expect(response_body.map { |todo| todo['completed'] }.all?).to be_truthy
+        end
+      end
+
+      it 'can be filtered for uncompleted todos' do
+        get '/todos', params: { completed: false }, headers: headers
+        response_body = JSON.parse(response.body)
+        aggregate_failures do
+          expect(response_body.count).to eq(uncompleted_todos.count)
+          expect(response_body.map { |todo| todo['completed'] }.any?).to be_falsy
+        end
       end
     end
   end

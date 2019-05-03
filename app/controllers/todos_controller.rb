@@ -11,7 +11,7 @@ class TodosController < ApplicationController
   rescue_from ActiveRecord::RecordInvalid, with: :render_bad_request
 
   def index
-    todos = Todo.all
+    todos = params.key?(:completed) ? Todo.where(completed: params[:completed]) : Todo.all
     render json: todos
   end
 
