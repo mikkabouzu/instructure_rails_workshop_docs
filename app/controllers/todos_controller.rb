@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 class TodosController < ApplicationController
+  attr_reader :todo
+
+  before_action :fetch_todo, only: %i[show update destroy]
+
   rescue_from ActiveRecord::RecordNotFound, with: :render_not_found
   rescue_from ActiveRecord::RecordInvalid, with: :render_bad_request
 
@@ -10,28 +14,29 @@ class TodosController < ApplicationController
   end
 
   def show
-    todo = Todo.find(params[:id])
     render json: todo
   end
 
   def create
-    todo = Todo.create!(todo_params)
-    render json: todo, status: :created
+    new_todo = Todo.create!(todo_params)
+    render json: new_todo, status: :created
   end
 
   def update
-    todo = Todo.find(params[:id])
     todo.update!(todo_params)
     render json: todo
   end
 
   def destroy
-    todo = Todo.find(params[:id])
     todo.destroy!
     head :no_content
   end
 
   private
+
+  def fetch_todo
+    @todo = Todo.find(params[:id])
+  end
 
   def todo_params
     params.permit(:title, :completed)
