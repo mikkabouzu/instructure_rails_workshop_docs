@@ -2,6 +2,7 @@
 
 class TodosController < ApplicationController
   API_KEY_HEADER = 'X_API_KEY'
+  TOTAL_COUNT_HEADER = 'X_TOTAL_COUNT'
   attr_reader :todo
 
   before_action :check_api_key
@@ -12,6 +13,7 @@ class TodosController < ApplicationController
 
   def index
     todos = params.key?(:completed) ? Todo.where(completed: params[:completed]) : Todo.all
+    response.set_header(TOTAL_COUNT_HEADER, todos.count)
     render json: todos
   end
 

@@ -20,6 +20,11 @@ RSpec.describe 'todos authorized' do
         response_body = JSON.parse(response.body)
         expect(response_body).to eql([])
       end
+
+      it 'sends X-Total-Count header' do
+        get '/todos', headers: headers
+        expect(response.headers['X_TOTAL_COUNT']).to eql(0)
+      end
     end
 
     context 'when there are some todos' do
@@ -38,12 +43,18 @@ RSpec.describe 'todos authorized' do
         expect(response_body.count).to eq(all_todos.count)
       end
 
+      it 'sends X-Total-Count header' do
+        get '/todos', headers: headers
+        expect(response.headers['X_TOTAL_COUNT']).to eql(all_todos.count)
+      end
+
       it 'can be filtered for completed todos' do
         get '/todos', params: { completed: true }, headers: headers
         response_body = JSON.parse(response.body)
         aggregate_failures do
           expect(response_body.count).to eq(completed_todos.count)
           expect(response_body.map { |todo| todo['completed'] }.all?).to be_truthy
+          expect(response.headers['X_TOTAL_COUNT']).to eql(completed_todos.count)
         end
       end
 
@@ -53,6 +64,7 @@ RSpec.describe 'todos authorized' do
         aggregate_failures do
           expect(response_body.count).to eq(uncompleted_todos.count)
           expect(response_body.map { |todo| todo['completed'] }.any?).to be_falsy
+          expect(response.headers['X_TOTAL_COUNT']).to eql(uncompleted_todos.count)
         end
       end
     end
