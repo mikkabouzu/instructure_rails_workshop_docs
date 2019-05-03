@@ -13,6 +13,10 @@ RSpec.describe 'todos' do
     expect(get: '/todos/42').to route_to(controller: 'todos', action: 'show', id: '42')
   end
 
+  it 'PUT todos/:id is routed to todos#update' do
+    expect(put: '/todos/42').to route_to(controller: 'todos', action: 'update', id: '42')
+  end
+
   it 'DELETE todos/:id is routed to todos#destroy' do
     expect(delete: '/todos/42').to route_to(controller: 'todos', action: 'destroy', id: '42')
   end

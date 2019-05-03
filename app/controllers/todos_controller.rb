@@ -20,6 +20,16 @@ class TodosController < ApplicationController
     render json: { error: 'bad request' }, status: :bad_request
   end
 
+  def update
+    todo = Todo.find(params[:id])
+    todo.update!(todo_params)
+    render json: todo
+  rescue ActiveRecord::RecordInvalid
+    render json: { error: 'bad request' }, status: :bad_request
+  rescue ActiveRecord::RecordNotFound
+    render json: { error: 'not found' }, status: :not_found
+  end
+
   def destroy
     todo = Todo.find(params[:id])
     todo.destroy!
