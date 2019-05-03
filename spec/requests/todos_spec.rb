@@ -33,6 +33,41 @@ RSpec.describe 'todos' do
     end
   end
 
+  describe 'POST /todos' do
+    context 'with valid parameters' do
+      let(:valid_params) { { title: 'just do it' } }
+
+      it 'responds with http 201' do
+        post '/todos', params: valid_params
+        expect(response).to have_http_status(:created)
+      end
+
+      it 'creates a todo' do
+        expect { post '/todos', params: valid_params }.to change(Todo, :count).by(1)
+      end
+
+      it 'responds with the newly created todo' do
+        post '/todos', params: valid_params
+        expect(response.body).to eql(Todo.last.to_json)
+      end
+    end
+
+    context 'with invalid parameters' do
+      let(:invalid_params) { { something: 'irrelevant' } }
+
+      it 'responds with http bad request' do
+        post '/todos', params: invalid_params
+        expect(response).to have_http_status(:bad_request)
+      end
+
+      it 'responds with an error' do
+        post '/todos', params: invalid_params
+        response_body = JSON.parse(response.body)
+        expect(response_body).to eql('error' => 'bad request')
+      end
+    end
+  end
+
   describe 'GET /todos/:id' do
     context 'when there is a todo with the specified id' do
       let!(:todo) { create(:todo) }

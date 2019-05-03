@@ -13,11 +13,24 @@ class TodosController < ApplicationController
     render json: { error: 'not found' }, status: :not_found
   end
 
+  def create
+    todo = Todo.create!(todo_params)
+    render json: todo, status: :created
+  rescue ActiveRecord::RecordInvalid
+    render json: { error: 'bad request' }, status: :bad_request
+  end
+
   def destroy
     todo = Todo.find(params[:id])
     todo.destroy!
     head :no_content
   rescue ActiveRecord::RecordNotFound
     render json: { error: 'not found' }, status: :not_found
+  end
+
+  private
+
+  def todo_params
+    params.permit(:title, :completed)
   end
 end

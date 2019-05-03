@@ -5,6 +5,10 @@ RSpec.describe 'todos' do
     expect(get: '/todos').to route_to(controller: 'todos', action: 'index')
   end
 
+  it 'POST todos/ is routed to todos#create' do
+    expect(post: '/todos').to route_to(controller: 'todos', action: 'create')
+  end
+
   it 'GET todos/:id is routed to todos#show' do
     expect(get: '/todos/42').to route_to(controller: 'todos', action: 'show', id: '42')
   end
