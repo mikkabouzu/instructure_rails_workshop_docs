@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
 class TodosController < ApplicationController
+  API_KEY_HEADER = 'X_API_KEY'
   attr_reader :todo
 
+  before_action :check_api_key
   before_action :fetch_todo, only: %i[show update destroy]
 
   rescue_from ActiveRecord::RecordNotFound, with: :render_not_found
@@ -33,6 +35,12 @@ class TodosController < ApplicationController
   end
 
   private
+
+  def check_api_key
+    return if request.headers[API_KEY_HEADER] == Rails.configuration.api_key
+
+    head :unauthorized
+  end
 
   def fetch_todo
     @todo = Todo.find(params[:id])
