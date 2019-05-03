@@ -3,6 +3,8 @@
 class TodosController < ApplicationController
   API_KEY_HEADER = 'X_API_KEY'
   TOTAL_COUNT_HEADER = 'X_TOTAL_COUNT'
+  DEFAULT_PAGE_SIZE = 20
+
   attr_reader :todo
 
   before_action :check_api_key
@@ -12,9 +14,8 @@ class TodosController < ApplicationController
   rescue_from ActiveRecord::RecordInvalid, with: :render_bad_request
 
   def index
-    todos = params.key?(:completed) ? Todo.where(completed: params[:completed]) : Todo.all
-    response.set_header(TOTAL_COUNT_HEADER, todos.count)
-    render json: todos
+    response.set_header(TOTAL_COUNT_HEADER, todos.except(:limit, :offset).count)
+    render json: todos.page(page).per(per_page)
   end
 
   def show
@@ -38,6 +39,10 @@ class TodosController < ApplicationController
 
   private
 
+  def todos
+    @todos ||= params.key?(:completed) ? Todo.where(completed: params[:completed]) : Todo.all
+  end
+
   def check_api_key
     return if request.headers[API_KEY_HEADER] == Rails.configuration.api_key
 
@@ -50,6 +55,15 @@ class TodosController < ApplicationController
 
   def todo_params
     params.permit(:title, :completed)
+  end
+
+  def page
+    params[:page].to_i.abs
+  end
+
+  def per_page
+    page_size = params[:page_size].to_i.abs
+    page_size.zero? ? DEFAULT_PAGE_SIZE : page_size
   end
 
   def render_not_found

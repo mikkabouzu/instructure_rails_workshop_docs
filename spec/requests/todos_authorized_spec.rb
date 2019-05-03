@@ -67,6 +67,15 @@ RSpec.describe 'todos authorized' do
           expect(response.headers['X_TOTAL_COUNT']).to eql(uncompleted_todos.count)
         end
       end
+
+      it 'can be paginated' do
+        get '/todos', params: { page: 2, page_size: 2 }, headers: headers
+        response_body = JSON.parse(response.body)
+        aggregate_failures do
+          expect(response_body.count).to eq(2)
+          expect(response.headers['X_TOTAL_COUNT']).to eql(all_todos.count)
+        end
+      end
     end
   end
 
