@@ -31,4 +31,32 @@ RSpec.describe 'todos' do
       end
     end
   end
+
+  describe 'DELETE /todos/:id' do
+    context 'when there is a todo with the specified id' do
+      let!(:todo) { create(:todo) }
+
+      it 'responds with http 204' do
+        delete "/todos/#{todo.id}"
+        expect(response).to have_http_status(:no_content)
+      end
+
+      it 'deletes the todo' do
+        expect { delete "/todos/#{todo.id}" }.to change { Todo.exists?(todo.id) }.from(true).to(false)
+      end
+    end
+
+    context 'when there is no todo with the specified id' do
+      it 'responds with http 404' do
+        delete '/todos/42'
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it 'responds with an error' do
+        delete '/todos/42'
+        response_body = JSON.parse(response.body)
+        expect(response_body).to eql('error' => 'not found')
+      end
+    end
+  end
 end

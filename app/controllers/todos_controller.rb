@@ -7,4 +7,12 @@ class TodosController < ApplicationController
   rescue ActiveRecord::RecordNotFound
     render json: { error: 'not found' }, status: :not_found
   end
+
+  def destroy
+    todo = Todo.find(params[:id])
+    todo.destroy!
+    head :no_content
+  rescue ActiveRecord::RecordNotFound
+    render json: { error: 'not found' }, status: :not_found
+  end
 end
