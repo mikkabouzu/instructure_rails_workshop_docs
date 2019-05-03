@@ -5,9 +5,5 @@ Rails.application.routes.draw do
   root to: 'healthcheck#index'
   get :healthcheck, to: 'healthcheck#index'
 
-  get 'todos', to: 'todos#index'
-  post 'todos', to: 'todos#create'
-  get 'todos/:id', to: 'todos#show'
-  put 'todos/:id', to: 'todos#update'
-  delete 'todos/:id', to: 'todos#destroy'
+  resources :todos
 end
